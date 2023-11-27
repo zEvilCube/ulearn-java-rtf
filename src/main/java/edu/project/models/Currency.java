@@ -1,14 +1,23 @@
 package edu.project.models;
 
+import edu.project.utils.HTTP;
+
 public enum Currency {
     AZN,
-    BYR,
+    BYN,
     EUR,
     GEL,
     KGS,
     KZT,
-    RUR,
+    RUB,
     UAH,
     USD,
-    UZS
+    UZS;
+
+    public static double convert(Currency from, Currency to, double amount) {
+        if (from == to) {
+            return amount;
+        }
+        return Double.parseDouble(HTTP.getCurrencyConversionResponse(from, to, amount));
+    }
 }
