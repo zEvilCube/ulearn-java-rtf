@@ -1,26 +1,27 @@
 package edu.project;
 
+import edu.project.models.Currency;
+import edu.project.models.Vacancy;
+import edu.project.utils.CSV;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public final class Main {
     private final static Logger LOGGER = LogManager.getLogger();
+    private final static String CSV_PATH = "src/main/resources/vacancies.csv";
 
     private Main() { }
 
+    @SuppressWarnings("MagicNumber")
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        LOGGER.info("Hello and welcome!");
+        List<Vacancy> vacancies = CSV.readVacancies(CSV_PATH);
+        vacancies.forEach(LOGGER::info);
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 0; i <= 2; i++) {
-
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            LOGGER.info("i = {}", i);
-        }
+        Currency fromCurrency = Currency.USD;
+        Currency toCurrency = Currency.RUB;
+        double moneyAmount = 100;
+        double convertedAmount = Currency.convert(fromCurrency, toCurrency, moneyAmount);
+        LOGGER.info(String.format("%f (%s) = %f (%s)", moneyAmount, fromCurrency, convertedAmount, toCurrency));
     }
 }
