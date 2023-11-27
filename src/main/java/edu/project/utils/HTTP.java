@@ -11,10 +11,8 @@ import java.util.regex.Pattern;
 
 public final class HTTP {
     private static final String CURRENCY_URL = "https://v6.exchangerate-api.com/v6/%s/pair/%s/%s/%f";
-    private static final String CURRENCY_API_KEY =
-        //<editor-fold desc="secret">
-            "3c0e6951c655bcaea88f9e1f";
-        //</editor-fold>
+    private static final String CURRENCY_API_KEY = //<editor-fold desc="secret">
+        "3c0e6951c655bcaea88f9e1f"; //</editor-fold>
     private static final Pattern CURRENCY_PATTERN = Pattern.compile("\"conversion_result\":(\\d+\\.\\d+)");
 
     private HTTP() { }

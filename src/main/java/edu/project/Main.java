@@ -9,12 +9,13 @@ import org.apache.logging.log4j.Logger;
 
 public final class Main {
     private final static Logger LOGGER = LogManager.getLogger();
+    private final static String CSV_PATH = "src/main/resources/vacancies.csv";
 
     private Main() { }
 
     @SuppressWarnings("MagicNumber")
     public static void main(String[] args) {
-        List<Vacancy> vacancies = CSV.readVacancies("src/main/resources/vacancies.csv");
+        List<Vacancy> vacancies = CSV.readVacancies(CSV_PATH);
         vacancies.forEach(LOGGER::info);
 
         Currency fromCurrency = Currency.USD;
