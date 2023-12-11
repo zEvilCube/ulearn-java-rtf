@@ -1,12 +1,12 @@
 package edu.project.models;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 public record Vacancy(
     String name,
     String description,
-    Set<String> keySkills,
+    List<String> keySkills,
     Experience experience,
     boolean premium,
     String employerName,

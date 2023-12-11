@@ -6,4 +6,7 @@ public record Salary(
     boolean gross,
     Currency currency
 ) {
+    public double getAverageRUB() {
+        return Currency.convertToRUB(currency, (from + to) / 2);
+    }
 }
