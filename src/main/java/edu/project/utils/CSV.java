@@ -14,8 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class CSV {
     private static final Map<String, Experience> EXPERIENCE_PARSING_MAP = Map.of(
@@ -27,16 +26,16 @@ public final class CSV {
 
     private CSV() {}
 
-    public static List<Vacancy> readVacancies(String filePath) {
+    public static Stream<String[]> getStream(String filePath) {
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)).withSkipLines(1).build()) {
-            return csvReader
-                .readAll()
-                .stream()
-                .map(CSV::parseVacancy)
-                .toList();
+            return csvReader.readAll().stream();
         } catch (IOException | CsvException exception) {
             throw new RuntimeException(exception);
         }
+    }
+
+    public static List<Vacancy> readVacancies(String filePath) {
+        return getStream(filePath).map(CSV::parseVacancy).toList();
     }
 
     @SuppressWarnings("MagicNumber")
@@ -65,8 +64,8 @@ public final class CSV {
         return EXPERIENCE_PARSING_MAP.get(string);
     }
 
-    private static Set<String> parseKeySkills(String keySkillsString) {
-        return Arrays.stream(keySkillsString.split("\n")).collect(Collectors.toSet());
+    private static List<String> parseKeySkills(String keySkillsString) {
+        return Arrays.stream(keySkillsString.split("\n")).toList();
     }
 
     public static Salary parseSalary(String fromString, String toString, String grossString, String currencyString) {
