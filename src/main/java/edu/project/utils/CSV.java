@@ -14,28 +14,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public final class CSV {
-    private static final Map<String, Experience> EXPERIENCE_PARSING_MAP = Map.of(
-        "noExperience", Experience.NO_EXPERIENCE,
-        "between1And3", Experience.BETWEEN_1_AND_3,
-        "between3And6", Experience.BETWEEN_3_AND_6,
-        "moreThan6", Experience.MORE_THAN_6
-    );
-
     private CSV() {}
 
-    public static Stream<String[]> getStream(String filePath) {
+    public static List<Vacancy> readVacancies(String filePath) {
         try (CSVReader csvReader = new CSVReaderBuilder(new FileReader(filePath)).withSkipLines(1).build()) {
-            return csvReader.readAll().stream();
+            return csvReader.readAll().stream().map(CSV::parseVacancy).toList();
         } catch (IOException | CsvException exception) {
             throw new RuntimeException(exception);
         }
-    }
-
-    public static List<Vacancy> readVacancies(String filePath) {
-        return getStream(filePath).map(CSV::parseVacancy).toList();
     }
 
     @SuppressWarnings("MagicNumber")
@@ -53,7 +41,7 @@ public final class CSV {
         );
     }
 
-    private static String parseDescription(String description) {
+    public static String parseDescription(String description) {
         return description
             .replaceAll("<[^<>]*>", "")
             .replaceAll("\\s+", " ")
@@ -61,10 +49,15 @@ public final class CSV {
     }
 
     public static Experience parseExperience(String string) {
-        return EXPERIENCE_PARSING_MAP.get(string);
+        return Map.of(
+            "noExperience", Experience.NO_EXPERIENCE,
+            "between1And3", Experience.BETWEEN_1_AND_3,
+            "between3And6", Experience.BETWEEN_3_AND_6,
+            "moreThan6", Experience.MORE_THAN_6
+        ).get(string);
     }
 
-    private static List<String> parseKeySkills(String keySkillsString) {
+    public static List<String> parseKeySkills(String keySkillsString) {
         return Arrays.stream(keySkillsString.split("\n")).toList();
     }
 
@@ -77,7 +70,7 @@ public final class CSV {
         );
     }
 
-    private static LocalDateTime parsePublishedAt(String publishedAtString) {
+    public static LocalDateTime parsePublishedAt(String publishedAtString) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
         return LocalDateTime.parse(publishedAtString, dateTimeFormatter);
     }

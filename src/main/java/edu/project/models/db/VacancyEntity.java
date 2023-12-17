@@ -2,6 +2,7 @@ package edu.project.models.db;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import edu.project.models.Currency;
 import edu.project.models.Vacancy;
 import java.time.LocalDateTime;
 
@@ -10,7 +11,9 @@ public class VacancyEntity {
     @DatabaseField(canBeNull = false)
     private String name;
     @DatabaseField(canBeNull = false)
-    private double salaryRUB;
+    private double salary;
+    @DatabaseField(canBeNull = false)
+    private Currency salaryCurrency;
     @DatabaseField(canBeNull = false)
     private String areaName;
     @DatabaseField(id = true)
@@ -20,7 +23,8 @@ public class VacancyEntity {
 
     public VacancyEntity(Vacancy vacancy) {
         this.name = vacancy.name();
-        this.salaryRUB = vacancy.salary().getAverageRUB();
+        this.salary = vacancy.salary().getAverage();
+        this.salaryCurrency = vacancy.salary().currency();
         this.areaName = vacancy.areaName();
         this.publishedAt = vacancy.publishedAt().toString();
     }
@@ -30,14 +34,19 @@ public class VacancyEntity {
     }
 
     public double getSalaryRUB() {
-        return salaryRUB;
+        return Currency.convertToRUB(salaryCurrency, salary);
     }
 
     public String getAreaName() {
         return areaName;
     }
 
-    public LocalDateTime getPublishedAt() {
-        return LocalDateTime.parse(publishedAt);
+    public int getPublishYear() {
+        return LocalDateTime.parse(publishedAt).getYear();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s - %.0f руб - %s - %d г.", name, getSalaryRUB(), areaName, getPublishYear());
     }
 }
