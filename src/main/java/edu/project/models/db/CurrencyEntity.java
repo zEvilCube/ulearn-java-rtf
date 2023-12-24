@@ -6,10 +6,10 @@ import edu.project.models.Currency;
 
 @DatabaseTable(tableName = "Currency")
 public class CurrencyEntity {
-    public static final String CURRENCY_COLUMN_NAME = "currency";
+    public static final String CURRENCY_COLUMN_NAME = "numCode";
 
     @DatabaseField(columnName = CURRENCY_COLUMN_NAME, id = true)
-    private Currency currency;
+    private Currency numCode;
 
     @DatabaseField(canBeNull = false)
     private double rateToRUB;
@@ -17,7 +17,7 @@ public class CurrencyEntity {
     public CurrencyEntity() {}
 
     public CurrencyEntity(Currency currency, double rateToRUB) {
-        this.currency = currency;
+        this.numCode = currency;
         this.rateToRUB = rateToRUB;
     }
 

@@ -5,12 +5,12 @@ import com.j256.ormlite.dao.DaoManager;
 import java.sql.SQLException;
 import java.util.List;
 
-public class DAO<T> {
+public class DAOManager<T> {
     private final Dao<T, String> dao;
 
-    public DAO(Class<T> daoClass) {
+    public DAOManager(Class<T> daoClass) {
         try {
-            dao = DaoManager.createDao(DB.getConnectionSource(), daoClass);
+            dao = DaoManager.createDao(DBManager.getConnectionSource(), daoClass);
         } catch (SQLException exception) {
             throw new RuntimeException(exception);
         }

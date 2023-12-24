@@ -1,57 +1,41 @@
 package edu.project;
 
-import edu.project.models.Currency;
-import edu.project.models.Vacancy;
 import edu.project.models.db.CurrencyEntity;
 import edu.project.models.db.VacancyEntity;
-import edu.project.utils.CSV;
-import edu.project.utils.db.DAO;
-import edu.project.utils.db.DB;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import edu.project.utils.Stats;
+import edu.project.utils.db.DAOManager;
+import edu.project.utils.db.DBManager;
+import edu.project.utils.gui.Drawer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public final class Main {
-    private final static Logger LOGGER = LogManager.getLogger();
+    private final static Logger LOGGER = LogManager.getLogger(Main.class);
     private final static String CSV_PATH = "src/main/resources/vacancies.csv";
     private static final String DB_PATH = "jdbc:sqlite:src/main/resources/database.db";
 
     private Main() { }
 
     public static void main(String[] args) {
-        DB.setConnectionSource(DB_PATH);
+        DBManager.setConnectionSource(DB_PATH);
+        DBManager.createAll(new DAOManager<>(VacancyEntity.class), new DAOManager<>(CurrencyEntity.class));
+        LOGGER.info("База данных инициализирована\n");
 
-        DAO<VacancyEntity> vacancyDao = new DAO<>(VacancyEntity.class);
-        DAO<CurrencyEntity> currencyDao = new DAO<>(CurrencyEntity.class);
-        DB.createAll(vacancyDao, currencyDao);
+        // DBManager.clearTable(new DAOManager<>(CurrencyEntity.class));
+        // LOGGER.info("Курс валют обновлён\n");
 
-        updateVacancies(vacancyDao);
+        var vacancies = Stats.getFromDB();
+        if (!vacancies.isEmpty()) {
+            LOGGER.info("Вакансии считаны из базы.");
+            vacancies.forEach(vacancy -> LOGGER.info(String.format("Вакансия из БД: %s", vacancy)));
+            LOGGER.info(String.format("Всего в базе: %d вакансий\n", vacancies.size()));
+        } else {
+            LOGGER.warn("В базе вакансий нет, загружаем из csv-файла...");
+            vacancies = Stats.getFromCSV(CSV_PATH);
+            vacancies.forEach(vacancy -> LOGGER.info(String.format("Вакансия из CSV: %s", vacancy)));
+            LOGGER.info("Загрузка окончена\n");
+        }
 
-        List<VacancyEntity> dbVacancies = vacancyDao.getAll();
-        dbVacancies.forEach(
-            vacancy -> {
-                String name = vacancy.getName();
-                double salaryRUB = vacancy.getSalaryRUB();
-                String areaName = vacancy.getAreaName();
-                LocalDateTime publishedAt = vacancy.getPublishedAt();
-                LOGGER.info(String.format("%s - %f - %s - %s", name, salaryRUB, areaName, publishedAt));
-            }
-        );
-
-        Arrays.stream(Currency.values()).forEach(
-            currency -> {
-                double amount = 1d;
-                double rate = Currency.convertToRUB(currency, amount);
-                LOGGER.info(String.format("%f %s = %f RUB", amount, currency, rate));
-            }
-        );
-    }
-
-    public static void updateVacancies(DAO<VacancyEntity> vacancyDao) {
-        List<Vacancy> csvVacancies = CSV.readVacancies(CSV_PATH);
-        vacancyDao.updateAll(csvVacancies.stream().map(VacancyEntity::new).toList());
-        // csvVacancies.forEach(LOGGER::info);
+        new Drawer(vacancies, "Программист").setVisible(true);
     }
 }
